@@ -4,7 +4,7 @@ import { gsap } from "gsap";
 
 const App = () => {
 
-  const [taps, setTaps] = useState(0);
+  const [taps, setTaps] = useState(5);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [started, setStarted] = useState(false);
 
@@ -28,51 +28,66 @@ const App = () => {
   setStarted(true);
 
   }
+useEffect(() => {
+  if (!started) return;
+  gsap.set(swan2.current, {
+    scaleX: -1,
 
-  useEffect(() => {
-    if (!started) return;
+  });
+  const tl = gsap.timeline();
 
-    const tl = gsap.timeline();
+  // Fly in
+  tl.fromTo(
+    swan1.current,
+    { y: 700, x: -200, rotation: -10 },
+    {
+      y: -100,
+      x: -80,
+      rotation: 0,
+      duration: 3,
+      ease: "none",
+    }
+  );
 
-    tl.fromTo(
-      swan1.current,
-      { y: 700, x: -100},
-      { y: 0, x: -80, duration: 3.5, ease: "power2.out" }
-    );
-
-    tl.fromTo(
-      swan2.current,
-      { y: -700, x: 100 },
-      { y: 0, x: 80, duration: 3.5, ease: "power2.out" },
-      "<"
-    );
-
-    // circle around each other
-    tl.to(swan1.current, {
+  tl.fromTo(
+    swan2.current,
+    { y: -700, x: 200, rotation: 10 },
+    {
+      y: 100,
       x: 80,
-      y: -80,
-      duration: 1,
-    });
+      rotation: 0,
+      duration: 3,
+      ease: "none",
+    },
+    "<"
+  );
 
-    tl.to(
-      swan2.current,
-      {
-        x: -80,
-        y: 80,
-        duration: 1,
-      },
-      "<"
-    );
+  // Swan 1 waddles around
+  tl.to(swan1.current, {
+    duration: 4,
+    ease: "none",
+    keyframes: [
+      { x: 100, y: -100, rotation: -8 },
+      { x: 100, y: 25, rotation: 8 },
+      { x: 50, y: 0, rotation: 0 },
+    ],
+  });
 
-    // come together
-    tl.to([swan1.current, swan2.current], {
-      x: 0,
-      y: 0,
-      duration: 1.5,
-      ease: "power2.inOut",
-    });
-
-  }, [started]);
+  // Swan 2 waddles around
+  tl.to(
+    swan2.current,
+    {
+      duration: 4,
+      ease: "none",
+      keyframes: [
+      { x: -100, y: 100, rotation: -8 },
+      { x: -100, y: -25, rotation: 8 },
+      { x: -50, y: 0, rotation: 0 },
+      ],
+    },
+    "<"
+  );
+}, [started]);
   
   return (
     <div className="flex justify-center items-center h-screen bg-pink-300 overflow-hidden">
@@ -91,7 +106,7 @@ const App = () => {
     {started && (
       <div className="absolute inset-0 flex items-center justify-center">
         <img ref={swan1} src="/swan.png" className="absolute w-40" />
-        <img ref={swan2} src="/swan.png" className="absolute w-40 scale-x-[-1]" />
+        <img ref={swan2} src="/swan.png" className="absolute w-40" />
       </div>
     )}
     </div>
